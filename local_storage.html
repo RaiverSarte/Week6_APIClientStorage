@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Storage</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<script src="script.js"></script>
+
+<body>
+
+    <h2>Save User Preferences</h2>
+
+    <label for="username">Enter Name:</label>
+    <input type="text" id="username">
+
+    <button onclick="saveData()">Save</button>
+    <button onclick="loadData()">Load</button>
+
+    <p id="display"></p>
+
+    <script>
+        function saveData() {
+            let name = document.getElementById("username").value;
+
+            if (name === "") {
+                alert("Please enter your name.");5555555
+                return;
+            }
+
+            localStorage.setItem("userName", name);
+
+            alert("Data Saved!");
+        }
+
+        function loadData() {
+            let name = localStorage.getItem("userName");
+
+            if (name) {
+                document.getElementById("display").innerText =
+                    "Welcome, " + name;
+            } else {
+                document.getElementById("display").innerText =
+                    "No data saved!";
+            }
+        }
+    </script>
+
+</body>
+
+</html>

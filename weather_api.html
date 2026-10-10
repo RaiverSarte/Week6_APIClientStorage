@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather API</title>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 30px;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin: 5px;
+        }
+
+        #weatherResult {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<script src="script.js"></script>
+
+<body>
+
+    <h2>Weather Checker</h2>
+
+    <input
+        type="text"
+        id="city"
+        placeholder="Enter city name"
+    >
+
+    <button onclick="getWeather()">
+        Get Weather
+    </button>
+
+    <div id="weatherResult"></div>
+
+    <script>
+
+        function getWeather() {
+
+            let city =
+                document.getElementById("city").value.trim();
+
+            if (city === "") {
+                alert("Please enter a city name.");
+                return;
+            }
+
+            // Find the city's coordinates
+            let locationURL =
+                `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`;
+
+            fetch(locationURL)
+
+                .then(response => response.json())
+
+                .then(locationData => {
+
+                    if (!locationData.results ||
+                        locationData.results.length === 0) {
+
+                        throw new Error("City not found.");
+                    }
+
+                    let location =
+                        locationData.results[0];
+
+                    let latitude =
+                        location.latitude;
+
+                    let longitude =
+                        location.longitude;
+
+                    let weatherURL =
+                        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&temperature_unit=celsius`;
+
+                    return fetch(weatherURL);
+                })
+
+                .then(response => response.json())
+
+                .then(data => {
+
+                    let temperature =
+                        data.current.temperature_2m;
+
+                    let weatherCode =
+                        data.current.weather_code;
+
+                    let description =
+                        getWeatherDescription(weatherCode);
+
+                    document.getElementById(
+                        "weatherResult"
+                    ).innerHTML = `
+
+                        <h3>Current Weather</h3>
+
+                        <p>
+                            Temperature:
+                            ${temperature}°C
+                        </p>
+
+                        <p>
+                            Condition:
+                            ${description}
+                        </p>
+                    `;
+                })
+
+                .catch(error => {
+
+                    document.getElementById(
+                        "weatherResult"
+                    ).innerText =
+                        "Error: " + error.message;
+                });
+        }
+
+        function getWeatherDescription(code) {
+
+            if (code === 0) {
+                return "Clear sky";
+            } else if (code === 1 || code === 2) {
+                return "Partly cloudy";
+            } else if (code === 3) {
+                return "Cloudy";
+            } else if (code >= 51 && code <= 57) {
+                return "Drizzle";
+            } else if (code >= 61 && code <= 67) {
+                return "Rain";
+            } else if (code >= 71 && code <= 77) {
+                return "Snow";
+            } else if (code >= 80 && code <= 82) {
+                return "Rain showers";
+            } else if (code >= 95) {
+                return "Thunderstorm";
+            } else {
+                return "Unknown weather";
+            }
+        }
+
+    </script>
+
+</body>
+
+</html>

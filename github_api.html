@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>GitHub API</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 30px;
+        }
+
+        input,
+        button {
+            padding: 10px;
+            margin: 5px;
+        }
+
+        #userResult {
+            margin-top: 20px;
+        }
+
+        #userResult img {
+            width: 100px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<script src="script.js"></script>
+
+<body>
+
+    <h2>GitHub User Lookup</h2>
+
+    <input
+        type="text"
+        id="username"
+        placeholder="Enter GitHub Username"
+    >
+
+    <button onclick="getUser()">
+        Get User
+    </button>
+
+    <div id="userResult"></div>
+
+    <script>
+
+        function getUser() {
+
+            let username =
+                document.getElementById(
+                    "username"
+                ).value.trim();
+
+            if (username === "") {
+
+                document.getElementById(
+                    "userResult"
+                ).innerText =
+                    "Please enter a GitHub username.";
+
+                return;
+            }
+
+            let url =
+                `https://api.github.com/users/${encodeURIComponent(username)}`;
+
+            fetch(url)
+
+                .then(response => {
+
+                    if (!response.ok) {
+                        throw new Error(
+                            "GitHub user not found."
+                        );
+                    }
+
+                    return response.json();
+                })
+
+                .then(data => {
+
+                    document.getElementById(
+                        "userResult"
+                    ).innerHTML = `
+
+                        <h3>
+                            ${data.name || "No Name Found"}
+                        </h3>
+
+                        <img
+                            src="${data.avatar_url}"
+                            alt="GitHub Profile Picture"
+                        >
+
+                        <p>
+                            Username:
+                            ${data.login}
+                        </p>
+
+                        <p>
+                            Public Repositories:
+                            ${data.public_repos}
+                        </p>
+
+                        <p>
+                            Followers:
+                            ${data.followers}
+                        </p>
+
+                    `;
+                })
+
+                .catch(error => {
+
+                    document.getElementById(
+                        "userResult"
+                    ).innerText =
+                        "Error: " + error.message;
+                });
+        }
+
+    </script>
+
+</body>
+
+</html>
